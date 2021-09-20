@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>viewer</title>
+  <style>
+    body {
+      background-color: #e5ddb0;
+    }
+
+    #grid {
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      justify-content: left;
+    }
+  </style>
+  <script>
+    // how to use context menu
+    // http://docs.nwjs.io/en/latest/For%20Users/Getting%20Started/
+
+    var imgWidth = 200;
+
+    // main
+    function main() {
+      document.getElementById("grid").style.width = 5 * imgWidth + "px";
+      api.ipcM2R()
+        .then(picDB => {
+          for (var i = 0; i < picDB.length; i++) {
+            thumbnail(picDB[i]["path"], picDB[i]["name"], imgWidth);
+          }
+        });
+    }
+
+    function thumbnail(path, name, width) {
+      var img = document.createElement("img");
+      img.src = path;
+      img.title = name;
+      img.width = width;
+      img.onclick = () => {
+        console.log(path);
+      };
+      // document.body.appendChild(img);
+      document.getElementById("grid").appendChild(img);
+    }
+
+    function test_createPrompt(buttonName) {
+      var textBox = document.createElement("input");
+      textBox.type = "text";
+      textBox.placeholder = "type";
+      var submit = document.createElement("input");
+      submit.type = "submit";
+      submit.value = buttonName;
+      submit.onclick = () => {
+        console.log(textBox.value);
+        api.ipcR2M(textBox.value);
+      }
+      var form = document.createElement("form");
+      form.appendChild(textBox);
+      form.appendChild(submit);
+      var dialog = document.createElement("dialog");
+      dialog.appendChild(form);
+      document.body.appendChild(dialog);
+      dialog.showModal();
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        dialog.close();
+      });
+    }
+  </script>
+</head>
+
+<body onLoad="main()">
+  <div id="grid"></div>
+  <input type="button" value="test" onclick="test_createPrompt('something name')">
+</body>
+
+</html>
